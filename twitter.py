@@ -12,7 +12,7 @@ import json
 import urllib2
 
 help_message = '''
-Must provide at least a username using -u or --user
+Must provide a twitter username using -u or --user
 '''
 
 class Usage(Exception):
@@ -43,7 +43,7 @@ def main(argv=None):
 	
 		# here's the cool stuff, all in one line of code - get a json response with the statuses
 		statuses = json.load(urllib2.urlopen('http://twitter.com/statuses/user_timeline/' + user + '.json'))
-		print "%s statuses fetched" % len(statuses)
+		print "%s statuses fetched, dumping..." % len(statuses)
 		
 		for status in statuses:
 			print status['text'] + ' - ' + status['created_at']
