@@ -54,5 +54,6 @@ while 1:
 		emails = new_emails
 	except:
 		# we just swallow errors, typically they are random connection failures
+		print 'Error fetching feed'
 	time.sleep(120)
 
