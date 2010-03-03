@@ -14,22 +14,26 @@ def main(argv=None):
 		print 'No filename provided'
 		return
 
-	# prompt user for credentials
-	username = raw_input('Username: ')
-	password = getpass.getpass()
-
 	# first, make sure we can read the file
 	filename = argv[1]
 	print 'Reading %s...' % filename
-	file = open(filename, 'r')
-	image_bytes = file.read()
-	file.close()
+	try:
+		file = open(filename, 'r')
+		image_bytes = file.read()
+		file.close()
+	except Exception, reason:
+		print reason
+		return
 	print '%d bytes read' % len(image_bytes)
 
 	# don't allow an upload > 1MB
 	if len(image_bytes) > (1024 * 1024):
 		print 'Cannot upload files larger than 1MB'
 		return
+
+	# prompt user for credentials
+	username = raw_input('Username: ')
+	password = getpass.getpass()
 
 	# set up our connection
 	conn = httplib.HTTPSConnection('jorge-v.appspot.com')
