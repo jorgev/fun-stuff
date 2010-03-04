@@ -60,17 +60,18 @@ def main(argv=None):
 	auth = data.split('\n')[2].split('=')[1]
 
 	# set up our image upload
-	args = { 'continue': 'https://jorge-v.appspot.com/capture/', 'auth': auth }
+	continue_url = 'https://jorge-v.appspot.com/capture/'
+	args = { 'continue': continue_url, 'auth': auth }
 	cookie_url = 'https://jorge-v.appspot.com/_ah/login?%s' % urllib.urlencode(args)
 	request = urllib2.Request(cookie_url)
 	try:
 		response = opener.open(request)
 	except urllib2.HTTPError, e:
-		if e.code != 302:
+		if e.code != 302 or e.info()['location'] != continue_url:
 			print e
 			return
 	headers = { 'Content-Type': 'image/png' }
-	request = urllib2.Request('https://jorge-v.appspot.com/capture/', image_bytes, headers)
+	request = urllib2.Request(continue_url, image_bytes, headers)
 	try:
 		response = opener.open(request)
 	except urllib2.HTTPError, e:
