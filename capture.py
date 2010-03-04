@@ -3,7 +3,9 @@
 import sys
 import base64
 import getpass
-import httplib
+import urllib
+import urllib2
+import cookielib
 
 def main(argv=None):
 	if argv is None:
@@ -32,22 +34,50 @@ def main(argv=None):
 		return
 
 	# prompt user for credentials
-	username = raw_input('Username: ')
+	username = raw_input('Google Accounts username/email: ')
 	password = getpass.getpass()
 
-	# set up our connection
-	conn = httplib.HTTPSConnection('jorge-v.appspot.com')
-	auth = base64.b64encode('%s:%s' % (username, password))
-	auth_header = 'Basic %s' % auth
-	headers = { 'Content-Type': 'image/png', 'Authorization': auth_header }
-	conn.request('PUT', '/capture/', image_bytes, headers)
+	# build up a url opener that supports cookies
+	opener = urllib2.OpenerDirector()
+	opener.add_handler(urllib2.ProxyHandler())
+	opener.add_handler(urllib2.UnknownHandler())
+	opener.add_handler(urllib2.HTTPHandler())
+	opener.add_handler(urllib2.HTTPDefaultErrorHandler())
+	opener.add_handler(urllib2.HTTPSHandler())
+	opener.add_handler(urllib2.HTTPErrorProcessor())
+	cookies = cookielib.MozillaCookieJar()
+	opener.add_handler(urllib2.HTTPCookieProcessor(cookies))
 
-	# get the response and dump the body
-	response = conn.getresponse()
-	print response.status, response.reason
+	# get an auth ticket from google
+	params = urllib.urlencode({ 'Email': username, 'Passwd': password, 'service': 'ah', 'source': 'jorge-v', 'accountType': 'HOSTED_OR_GOOGLE' })
+	request = urllib2.Request('https://www.google.com/accounts/ClientLogin', params);
+	try:
+		response = opener.open(request)
+	except urllib2.HTTPError, e:
+		print e
+		return
+	data = response.read()
+	auth = data.split('\n')[2].split('=')[1]
+
+	# set up our image upload
+	args = { 'continue': 'https://jorge-v.appspot.com/capture/', 'auth': auth }
+	cookie_url = 'https://jorge-v.appspot.com/_ah/login?%s' % urllib.urlencode(args)
+	request = urllib2.Request(cookie_url)
+	try:
+		response = opener.open(request)
+	except urllib2.HTTPError, e:
+		if e.code != 302:
+			print e
+			return
+	headers = { 'Content-Type': 'image/png' }
+	request = urllib2.Request('https://jorge-v.appspot.com/capture/', image_bytes, headers)
+	try:
+		response = opener.open(request)
+	except urllib2.HTTPError, e:
+		print e
+		return
 	data = response.read()
 	print data # entity should contain the URI for the new resource
-	conn.close()
 
 if __name__ == '__main__':
 	sys.exit(main())
