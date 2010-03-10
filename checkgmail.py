@@ -48,7 +48,9 @@ while 1:
 			title = '(no subject)'
 			if len(entry.getElementsByTagName('title')[0].childNodes) > 0:
 				title = entry.getElementsByTagName('title')[0].childNodes[0].data
-			summary = entry.getElementsByTagName('summary')[0].childNodes[0].data
+			summary = '(empty)'
+			if len(entry.getElementsByTagName('summary')[0].childNodes) > 0:
+				summary = entry.getElementsByTagName('summary')[0].childNodes[0].data
 			name = entry.getElementsByTagName('author')[0].getElementsByTagName('name')[0].childNodes[0].data
 			link = entry.getElementsByTagName('link')[0].getAttribute('href')
 
