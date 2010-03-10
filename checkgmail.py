@@ -34,6 +34,7 @@ while 1:
 		new_emails = []
 
 		# now iterate through the entries
+		entries.reverse()
 		for entry in entries:
 			# get the message id
 			id = entry.getElementsByTagName('id')[0].childNodes[0].data
@@ -44,7 +45,9 @@ while 1:
 				continue
 
 			# get the other values of interest to us
-			title = entry.getElementsByTagName('title')[0].childNodes[0].data
+			title = '(no subject)'
+			if len(entry.getElementsByTagName('title')[0].childNodes) > 0:
+				title = entry.getElementsByTagName('title')[0].childNodes[0].data
 			summary = entry.getElementsByTagName('summary')[0].childNodes[0].data
 			name = entry.getElementsByTagName('author')[0].getElementsByTagName('name')[0].childNodes[0].data
 			link = entry.getElementsByTagName('link')[0].getAttribute('href')
@@ -52,8 +55,8 @@ while 1:
 			# dump the message info out to the console
 			print '%s - %s - %s - %s' % (name, title, summary, link)
 		emails = new_emails
-	except:
+	except Exception, reason:
 		# we just swallow errors, typically they are random connection failures
-		print 'Error fetching feed'
+		print reason
 	time.sleep(120)
 
