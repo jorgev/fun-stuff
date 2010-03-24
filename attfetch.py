@@ -118,7 +118,7 @@ cookies = cookielib.MozillaCookieJar()
 opener.add_handler(urllib2.HTTPCookieProcessor(cookies))
 
 # here we make a POST to the login page, which will return 302 and we redirect to that page
-params = urllib.urlencode({ 'reportActionEvent': 'A_LGN_LOGIN_SUB', 'loginType': 'WIRELESS', 'actionEvent': 'preAuthenticate', 'ajaxSupported': '', 'domain': '.att.com', 'wireless_num': phone, 'pass': password, 'rememberCtn': ''  })
+params = urllib.urlencode({ 'reportActionEvent': 'A_LGN_LOGIN_SUB', 'loginType': 'WIRELESS', 'actionEvent': 'preAuthenticate', 'ajaxSupported': '', 'domain': '.att.com', 'wireless_num': phone, 'pass': password })
 req = urllib2.Request('https://www.wireless.att.com//olam/loginAction.doview', params)
 
 # connect to att login page
