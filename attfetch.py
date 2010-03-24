@@ -10,6 +10,8 @@ import htmllib
 import formatter
 from xml.dom import minidom
 
+entries = []
+
 # this is our class to handle redirects
 class SmartRedirectHandler(urllib2.HTTPRedirectHandler):     
 	def http_error_301(self, req, fp, code, msg, headers):  
@@ -24,20 +26,80 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 		result.status = code                                
 		return result
 
+# this class holds our row data
+class Entry():
+	def __init__(self):
+		self.date = None
+		self.time = None
+		self.timestamp = None
+		self.toFrom = None
+		self.type = None
+		self.direction = None
+
 # this is our class to parse the HTML
 class ATTParser(htmllib.HTMLParser):
 	def __init__(self, formatter):
-		self.table_name = None
+		self.in_table = False
+		self.in_body = False
+		self.in_anchor = False
+		self.current_row = None
+		self.column_index = 0
+		self.result = ''
 		htmllib.HTMLParser.__init__(self, formatter)
 
 	def start_table(self, attributes):
 		for attribute in attributes:
-			if attribute[0] == 'id':
-				self.table_name = attribute[1]
-				print self.table_name
+			if attribute[0] == 'id' and attribute[1] == 'curRow': # this is the id for the table with the data usage
+				self.in_table = True
 
 	def end_table(self):
-		self.table_name = None
+		self.in_table = False
+
+	def start_tbody(self, attributes):
+		if self.in_table:
+			self.in_body = True
+
+	def end_tbody(self):
+		if self.in_table:
+			self.in_body = False
+
+	def start_tr(self, attributes):
+		if self.in_body:
+			self.current_row = Entry() # start a new row entry
+			self.column_index = 0 # reset the column index
+
+	def end_tr(self):
+		if self.in_body and self.current_row:
+			entries.append(self.current_row) # we're at the end of the row, append the current row to our list of entries
+			self.current_row = None # and set the current row to nothing
+
+	def start_td(self, attributes):
+		self.result = '' # new table data, reset the variable we use to hold the data
+
+	def end_td(self):
+		if self.in_body and self.current_row:
+			self.result = self.result.strip() # remove leading and trailing whitespace
+			if self.column_index == 0:
+				self.current_row.date = self.result
+			elif self.column_index == 1:
+				self.current_row.time = self.result
+			elif self.column_index == 2:
+				self.current_row.toFrom = self.result
+			elif self.column_index == 3:
+				self.current_row.type = self.result
+			elif self.column_index == 4:
+				self.current_row.direction = self.result
+			self.column_index += 1
+
+	def start_a(self, attributes):
+		self.in_anchor = True
+
+	def end_a(self):
+		self.in_anchor = False
+
+	def handle_data(self, data):
+		if data and not self.in_anchor:
+			self.result += data # just keep appending
 
 # accept the phone number and password
 phone = raw_input('AT&T Phone # (numbers only, no dashes or spaces): ')
@@ -65,7 +127,15 @@ response = opener.open(req)
 # login should be cookied, we try to fetch the page now
 req = urllib2.Request('https://www.wireless.att.com/olam/gotoDataDetailsAction.olamexecute?reportActionEvent=A_UMD_DATA_DETAILS')
 response = opener.open(req)
+data = response.read()
 htmlparser = ATTParser(formatter.NullFormatter())
-htmlparser.feed(response.read())
+htmlparser.feed(data)
 htmlparser.close()
+
+# this is a fixup, we drop the last row because there is a bogus row that is in the <tbody> (should be in <tfoot>)
+entries.pop()
+
+# dump out the entries
+for entry in entries:
+	print entry.date, entry.time, entry.toFrom, entry.type, entry.direction
 
