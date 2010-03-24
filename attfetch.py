@@ -98,7 +98,7 @@ class ATTParser(htmllib.HTMLParser):
 		self.in_anchor = False
 
 	def handle_data(self, data):
-		if data and not self.in_anchor:
+		if data:
 			self.result += data # just keep appending
 
 # accept the phone number and password
