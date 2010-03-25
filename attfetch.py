@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 
-import sys
 import getpass
-import time
 import urllib
 import urllib2
 import cookielib
 import htmllib
 import formatter
-from xml.dom import minidom
 
 entries = []
 pages = []
@@ -33,7 +30,6 @@ class Entry():
 	def __init__(self):
 		self.date = None
 		self.time = None
-		self.timestamp = None
 		self.toFrom = None
 		self.type = None
 		self.direction = None
