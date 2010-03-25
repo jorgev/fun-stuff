@@ -161,5 +161,3 @@ while len(pages) > current_page_index:
 for entry in entries:
 	print entry.date, entry.time, entry.toFrom, entry.type, entry.direction
 
-print '%d total messages' % len(entries)
-
