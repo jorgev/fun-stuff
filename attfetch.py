@@ -159,5 +159,5 @@ while len(pages) > current_page_index:
 
 # dump out the entries
 for entry in entries:
-	print entry.date, entry.time, entry.toFrom, entry.type, entry.direction
+	print '%s %s, %s, %s, %s' % (entry.date, entry.time, entry.toFrom, entry.type, entry.direction)
 
