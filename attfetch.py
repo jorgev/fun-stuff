@@ -11,6 +11,8 @@ import formatter
 from xml.dom import minidom
 
 entries = []
+pages = []
+current_page_index = 0
 
 # this is our class to handle redirects
 class SmartRedirectHandler(urllib2.HTTPRedirectHandler):     
@@ -41,7 +43,7 @@ class ATTParser(htmllib.HTMLParser):
 	def __init__(self, formatter):
 		self.in_table = False
 		self.in_body = False
-		self.in_anchor = False
+		self.in_ul = False
 		self.current_row = None
 		self.column_index = 0
 		self.result = ''
@@ -92,10 +94,23 @@ class ATTParser(htmllib.HTMLParser):
 			self.column_index += 1
 
 	def start_a(self, attributes):
-		self.in_anchor = True
+		if self.in_ul:
+			for attribute in attributes:
+				if attribute[0] == 'href':
+					page = attribute[1]
+					if not page in pages: # make sure pages get added just once
+						pages.append(page)
 
 	def end_a(self):
-		self.in_anchor = False
+		return
+
+	def start_ul(self, attributes):
+		for attribute in attributes:
+			if attribute[0] == 'class' and attribute[1] == 'pagination':
+				self.in_ul = True # we're in the list that has the page links
+
+	def end_ul(self):
+		self.in_ul = False
 
 	def handle_data(self, data):
 		if data:
@@ -124,18 +139,27 @@ req = urllib2.Request('https://www.wireless.att.com//olam/loginAction.doview', p
 # connect to att login page
 response = opener.open(req)
 
-# login should be cookied, we try to fetch the page now
-req = urllib2.Request('https://www.wireless.att.com/olam/gotoDataDetailsAction.olamexecute?reportActionEvent=A_UMD_DATA_DETAILS')
-response = opener.open(req)
-data = response.read()
-htmlparser = ATTParser(formatter.NullFormatter())
-htmlparser.feed(data)
-htmlparser.close()
+# push the first page on to the array, others will be added from links
+pages.append('/olam/gotoDataDetailsAction.olamexecute?reportActionEvent=A_UMD_DATA_DETAILS&d-444584-p=1')
 
-# this is a fixup, we drop the last row because there is a bogus row that is in the <tbody> (should be in <tfoot>)
-entries.pop()
+# login should be cookied, we try to fetch the page now
+while len(pages) > current_page_index:
+	req = urllib2.Request('https://www.wireless.att.com' + pages[current_page_index])
+	response = opener.open(req)
+	data = response.read()
+	htmlparser = ATTParser(formatter.NullFormatter())
+	htmlparser.feed(data)
+	htmlparser.close()
+
+	# this is a fixup, we drop the last row because there is a bogus row that is in the <tbody> (should be in <tfoot>)
+	entries.pop()
+
+	# go to next page
+	current_page_index += 1
 
 # dump out the entries
 for entry in entries:
 	print entry.date, entry.time, entry.toFrom, entry.type, entry.direction
+
+print '%d total messages' % len(entries)
 
