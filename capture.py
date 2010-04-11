@@ -60,7 +60,7 @@ def main(argv=None):
 	auth = data.split('\n')[2].split('=')[1]
 
 	# set up our image upload
-	continue_url = 'https://jorge-v.appspot.com/capture/'
+	continue_url = 'https://jorge-v.appspot.com/capture'
 	args = { 'continue': continue_url, 'auth': auth }
 	cookie_url = 'https://jorge-v.appspot.com/_ah/login?%s' % urllib.urlencode(args)
 	request = urllib2.Request(cookie_url)
