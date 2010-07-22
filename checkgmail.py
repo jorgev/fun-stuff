@@ -3,6 +3,7 @@
 import sys
 import getpass
 import base64
+import datetime
 import time
 import urllib2
 from xml.dom import minidom
@@ -52,13 +53,18 @@ while 1:
 			if len(entry.getElementsByTagName('summary')[0].childNodes) > 0:
 				summary = entry.getElementsByTagName('summary')[0].childNodes[0].data
 			name = entry.getElementsByTagName('author')[0].getElementsByTagName('name')[0].childNodes[0].data
+			email = entry.getElementsByTagName('author')[0].getElementsByTagName('email')[0].childNodes[0].data
 			link = entry.getElementsByTagName('link')[0].getAttribute('href')
+			timestamp = entry.getElementsByTagName('modified')[0].childNodes[0].data
+			#timestamp = datetime.datetime.strptime(entry.getElementsByTagName('modified')[0].childNodes[0].data, '%Y-%m-%dT%H:%M:%SZ')
 
 			# dump the message info out to the console
-			print '%s - %s - %s - %s' % (name, title, summary, link)
+			print 'From: %s <%s>, Subject: %s, Message: %s - %s - %s' % (name, email, title, summary, link, timestamp)
 		emails = new_emails
 	except Exception, reason:
 		# we just swallow errors, typically they are random connection failures
 		print reason
+
+	# fetch every 2 mins
 	time.sleep(120)
 
