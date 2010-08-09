@@ -35,8 +35,8 @@ def main(argv=None):
 		return
 
 	# prompt user for credentials
-	username = raw_input('Google Accounts username/email: ')
-	password = getpass.getpass()
+	username = raw_input('Email: ')
+	password = getpass.getpass('Password for %s: ' % username)
 
 	# build up a url opener that supports cookies
 	opener = urllib2.OpenerDirector()
