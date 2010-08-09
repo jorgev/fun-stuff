@@ -6,6 +6,7 @@ import getpass
 import urllib
 import urllib2
 import cookielib
+from Carbon.Scrap import GetCurrentScrap, ClearCurrentScrap # this is for Mac clipboard (scrap) manipulation
 
 def main(argv=None):
 	if argv is None:
@@ -79,6 +80,9 @@ def main(argv=None):
 		return
 	data = response.read()
 	print data # entity should contain the URI for the new resource
+	ClearCurrentScrap()
+	scrap = GetCurrentScrap()
+	scrap.PutScrapFlavor('TEXT', 0, data)
 
 if __name__ == '__main__':
 	sys.exit(main())
