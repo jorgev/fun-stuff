@@ -31,6 +31,9 @@ def main(argv=None):
 			raise Usage(msg)
 	
 		# option processing
+		input = None
+		playlist = None
+		output = None
 		for option, value in opts:
 			if option == "-v":
 				verbose = True
@@ -42,11 +45,22 @@ def main(argv=None):
 				playlist = value
 			if option in ("-o", "--output"):
 				output = value
+		
+		# all options are required
+		if not input or not playlist or not output:
+			raise Usage('input, playlist, and output options are all required')
+			return 3
+		
+		doc = minidom.parse(input)
+		plist = doc.firstChild
 	
 	except Usage, err:
 		print >> sys.stderr, sys.argv[0].split("/")[-1] + ": " + str(err.msg)
 		print >> sys.stderr, "\t for help use --help"
 		return 2
+	except Exception, err:
+		print >> sys.stderr, err
+		return 3
 	
 	doc = minidom.parse(input)
 
