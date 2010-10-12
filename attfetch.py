@@ -148,7 +148,8 @@ while len(pages) > current_page_index:
 	htmlparser.close()
 
 	# this is a fixup, we drop the last row because there is a bogus row that is in the <tbody> (should be in <tfoot>)
-	entries.pop()
+	if len(entries) > 0:
+		entries.pop()
 
 	# go to next page
 	current_page_index += 1
