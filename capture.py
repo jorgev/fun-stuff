@@ -5,6 +5,9 @@ import uuid
 from boto.gs.connection import GSConnection
 from boto.gs.key import Key
 
+# replace with your bucket name
+BUCKET_NAME = 'capture.jorgev.com'
+
 def main(argv=None):
 	if argv is None:
 		argv = sys.argv
@@ -19,7 +22,7 @@ def main(argv=None):
 
 	# get the bucket for our upload
 	conn = GSConnection()
-	bucket = conn.get_bucket('capture.jorgev.com')
+	bucket = conn.get_bucket(BUCKET_NAME)
 
 	# create a new key with a unique name
 	key = Key(bucket)
@@ -28,7 +31,7 @@ def main(argv=None):
 	key.make_public()
 
 	# give the user a url good for one hour
-	print 'http://capture.jorgev.com/' + key.name
+	print 'http://%s/%s' % (BUCKET_NAME, key.name)
 
 if __name__ == '__main__':
 	sys.exit(main())
