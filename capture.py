@@ -5,7 +5,7 @@ import uuid
 from boto.gs.connection import GSConnection
 from boto.gs.key import Key
 
-# replace with your bucket name
+# replace with your bucket name...this only works with CNAME redirect, need to format the link differently if you are using it differently
 BUCKET_NAME = 'capture.jorgev.com'
 
 def main(argv=None):
