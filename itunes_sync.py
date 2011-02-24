@@ -100,11 +100,14 @@ def main(argv=None):
 		
 		# tracks are key/dict pairs
 		sync_flag = False
+		total = len(track_ids)
+		count = 0
 		for node in tracks.childNodes:
 			if node.nodeType == node.ELEMENT_NODE and node.nodeName == 'key':
 				if get_text(node.childNodes) in track_ids:
 					sync_flag = True
 			elif node.nodeType == node.ELEMENT_NODE and node.nodeName == 'dict' and sync_flag:
+				count += 1
 				name_node = get_key(node.childNodes, 'Name')
 				artist_node = get_key(node.childNodes, 'Artist')
 				location_node = get_key(node.childNodes, 'Location')
@@ -119,10 +122,10 @@ def main(argv=None):
 					if not os.path.exists(target_dir):
 						os.makedirs(target_dir)
 					if not os.path.exists(dest):
-						print 'Copying \'%s - %s\'...' % (name, artist)
+						print 'Copying %d of %d \'%s - %s\'...' % (count, total, name, artist)
 						shutil.copy(source, dest)
 					else:
-						print 'Skipping \'%s - %s\', already in destination' % (name, artist)
+						print 'Skipping %d of %d \'%s - %s\', already in destination' % (count, total, name, artist)
 				else:
 					print 'Unable to copy files that are not in the music folder: %s - %s' % (name, artist)
 				sync_flag = False # clear this flag for the next pass
