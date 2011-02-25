@@ -23,10 +23,12 @@ def main(argv=None):
 	# arg should be filename
 	filename = argv[1]
 
-	# create the request object
-	r = Response()
+	# substitute your api key here, or run the risk of exceeding the limit :)
 	c = pycurl.Curl()
 	values = [('key', '45d2553f4d1cea074e85fc463fc1bc09'), ('image', (c.FORM_FILE, filename))]
+	
+	# create the request object
+	r = Response()
 	c.setopt(c.URL, "http://api.imgur.com/2/upload.json")
 	c.setopt(c.HTTPPOST, values)
 	c.setopt(c.WRITEFUNCTION, r.body_callback)
