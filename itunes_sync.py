@@ -166,7 +166,7 @@ def get_text(nodes):
 	for node in nodes:
 		if node.nodeType == node.TEXT_NODE:
 			rc.append(node.data)
-	return ''.join(rc)
+	return ''.join(rc).encode('utf-8')
 	
 def get_track_ids(nodes):
 	ids = []
