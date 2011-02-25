@@ -18,7 +18,7 @@ from xml.dom import minidom
 help_message = '''
 -i <path to iTunes library xml file> (e.g., /Users/jorge/Music/iTunes/iTunes Music Library.xml)
 -p <name of playlist to copy>
--o <path to music folder on android device> (e.g., /Volumes/)
+-o <android mount path> (e.g., /Volumes/NO NAME)
 '''
 
 class Usage(Exception):
