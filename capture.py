@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 import sys
-import uuid
-from boto.gs.connection import GSConnection
-from boto.gs.key import Key
+import pycurl
+import json
 
-# replace with your bucket name...this only works with CNAME redirect, need to format the link differently if you are using it differently
-BUCKET_NAME = 'capture.jorgev.com'
+class Response:
+	def __init__(self):
+		self.contents = ''
+	
+	def body_callback(self, buf):
+		self.contents = self.contents + buf
 
 def main(argv=None):
 	if argv is None:
@@ -20,18 +23,19 @@ def main(argv=None):
 	# arg should be filename
 	filename = argv[1]
 
-	# get the bucket for our upload
-	conn = GSConnection()
-	bucket = conn.get_bucket(BUCKET_NAME)
-
-	# create a new key with a unique name
-	key = Key(bucket)
-	key.key = uuid.uuid4().hex
-	key.set_contents_from_filename(filename)
-	key.make_public()
-
-	# give the user a url good for one hour
-	print 'http://%s/%s' % (BUCKET_NAME, key.name)
+	# create the request object
+	r = Response()
+	c = pycurl.Curl()
+	values = [('key', '45d2553f4d1cea074e85fc463fc1bc09'), ('image', (c.FORM_FILE, filename))]
+	c.setopt(c.URL, "http://api.imgur.com/2/upload.json")
+	c.setopt(c.HTTPPOST, values)
+	c.setopt(c.WRITEFUNCTION, r.body_callback)
+	c.perform()
+	c.close()
+	
+	# print the response
+	info = json.loads(r.contents)
+	print info['upload']['links']['original']
 
 if __name__ == '__main__':
 	sys.exit(main())
