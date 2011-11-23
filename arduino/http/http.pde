@@ -2,6 +2,7 @@
 
 #include <SPI.h>
 #include <Ethernet.h>
+#include "http_client.h"
 
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x00, 0x8E, 0xC1 };
 byte ip[] = { 192, 168, 1, 120 };
@@ -10,9 +11,11 @@ byte subnet[] = { 255, 255, 255, 0 };
 byte server[] = { 74, 125, 53, 141 };
 
 Client client(server, 80);
+http_client http(mac, ip, gateway, subnet);
 
 void setup()
 {
+	http.init(server, 80);
 	Ethernet.begin(mac, ip, gateway, subnet);
 	Serial.begin(9600);
 
