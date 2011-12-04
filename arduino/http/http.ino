@@ -8,14 +8,13 @@ byte mac[] = { 0x90, 0xA2, 0xDA, 0x00, 0x8E, 0xC1 };
 byte ip[] = { 192, 168, 1, 120 };
 byte gateway[] = { 192, 168, 1, 254 };
 byte subnet[] = { 255, 255, 255, 0 };
-byte server[] = { 74, 125, 53, 141 };
+byte server[] = { 74, 125, 224, 147 };
 
-EthernetClient client(server, 80);
-http_client http(mac, ip, gateway, subnet);
+http_client client;
 
 void setup()
 {
-	http.init(server, 80);
+	// set up ethernet
 	Ethernet.begin(mac, ip, gateway, subnet);
 	Serial.begin(9600);
 
@@ -25,27 +24,10 @@ void setup()
 
 void loop()
 {
-	if (client.connect())
-	{
-		Serial.println("making request...");
-		client.println("GET / HTTP/1.0");
-		client.println("Host: jorgev-hrd.appspot.com");
-		//client.println("Accept: */*");
-		client.println();
-	
-		delay(1000);
-		while (client.available())
-		{
-			char c = client.read();
-			Serial.print(c);
-		}
+	// make a request
+	int ret = client.request(server, 80, "http://www.google.com");
 
-		client.stop();
-		delay(10000);
-	}
-	else
-	{
-		Serial.println("connection failed");
-	}
+	// sleep a little before the next request
+	delay(10000);
 }
 
