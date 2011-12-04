@@ -10,7 +10,7 @@ byte gateway[] = { 192, 168, 1, 254 };
 byte subnet[] = { 255, 255, 255, 0 };
 byte server[] = { 74, 125, 53, 141 };
 
-Client client(server, 80);
+EthernetClient client(server, 80);
 http_client http(mac, ip, gateway, subnet);
 
 void setup()
