@@ -7,6 +7,28 @@
 
 #define BUFSIZE 4096
 
+typedef struct {
+    uint32_t bbID;
+    uint64_t bbEntry;
+    uint32_t bbVersion;
+    uint32_t bbPageFlags;
+    char bbSysName[15];
+    char bbShellName[15];
+    char bbDbg1Name[15];
+    char bbDbg2Name[15];
+    char bbScreenName[15];
+    char bbHelloName[15];
+    char bbScrapName[15];
+    uint32_t bbCntFCBs;
+    uint32_t bbCntEvts;
+    uint64_t bb128KSHeap;
+    uint64_t bb256KSHeap;
+    uint64_t bbSysHeapSize;
+    uint32_t filler;
+    uint64_t bbSysHeapExtra;
+    uint64_t bbSysHeapFract;
+} HFS_BOOT_BLK_HDR;
+
 void err_sys(const char*, ...);
 void err_exit(int error, const char*, ...);
 static void err_doit(int, int, const char*, va_list);
@@ -23,8 +45,10 @@ int main(int argc, char* argv[]) {
         err_sys("Failed to open file");
     }
 
-    // read the mft
-    read(fd, buf, BUFSIZE);
+    ssize_t count = read(fd, buf, BUFSIZE);
+    printf("Count: %d\n", count);
+    HFS_BOOT_BLK_HDR* phdr = (HFS_BOOT_BLK_HDR*) buf;
+    printf("ID: %x\n", phdr->bbID);
 
     close(fd);
 
