@@ -1,13 +1,15 @@
 /* volrec.c - a volume recovery tool */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <stdint.h>
 
 #define BUFSIZE 4096
 
-typedef struct {
+struct HFS_BOOT_BLK_HDR {
     uint32_t bbID;
     uint64_t bbEntry;
     uint32_t bbVersion;
@@ -27,10 +29,10 @@ typedef struct {
     uint32_t filler;
     uint64_t bbSysHeapExtra;
     uint64_t bbSysHeapFract;
-} HFS_BOOT_BLK_HDR;
+};
 
 void err_sys(const char*, ...);
-void err_exit(int error, const char*, ...);
+void err_quit(const char*, ...);
 static void err_doit(int, int, const char*, va_list);
 
 int main(int argc, char* argv[]) {
@@ -46,8 +48,8 @@ int main(int argc, char* argv[]) {
     }
 
     ssize_t count = read(fd, buf, BUFSIZE);
-    printf("Count: %d\n", count);
-    HFS_BOOT_BLK_HDR* phdr = (HFS_BOOT_BLK_HDR*) buf;
+    printf("Count: %zd\n", count);
+    struct HFS_BOOT_BLK_HDR* phdr = (struct HFS_BOOT_BLK_HDR*) buf;
     printf("ID: %x\n", phdr->bbID);
 
     close(fd);
