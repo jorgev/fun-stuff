@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <string.h>
 
 #define BUFSIZE 4096
 
