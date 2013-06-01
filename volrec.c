@@ -7,30 +7,9 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
+#include <hfs/hfs_format.h>
 
 #define BUFSIZE 4096
-
-struct HFS_BOOT_BLK_HDR {
-    uint32_t bbID;
-    uint64_t bbEntry;
-    uint32_t bbVersion;
-    uint32_t bbPageFlags;
-    char bbSysName[15];
-    char bbShellName[15];
-    char bbDbg1Name[15];
-    char bbDbg2Name[15];
-    char bbScreenName[15];
-    char bbHelloName[15];
-    char bbScrapName[15];
-    uint32_t bbCntFCBs;
-    uint32_t bbCntEvts;
-    uint64_t bb128KSHeap;
-    uint64_t bb256KSHeap;
-    uint64_t bbSysHeapSize;
-    uint32_t filler;
-    uint64_t bbSysHeapExtra;
-    uint64_t bbSysHeapFract;
-};
 
 void err_sys(const char*, ...);
 void err_quit(const char*, ...);
@@ -48,10 +27,11 @@ int main(int argc, char* argv[]) {
         err_sys("Failed to open file");
     }
 
-    ssize_t count = read(fd, buf, BUFSIZE);
-    printf("Count: %zd\n", count);
-    struct HFS_BOOT_BLK_HDR* phdr = (struct HFS_BOOT_BLK_HDR*) buf;
-    printf("ID: %x\n", phdr->bbID);
+    ssize_t count = read(fd, buf, sizeof(buf));
+    HFSPlusVolumeHeader* phdr = (HFSPlusVolumeHeader*) (buf + 1024);
+    if (phdr->signature != 0x2b48) {
+        err_quit("Signature does not match HFS+ signature");
+    }
 
     close(fd);
 
