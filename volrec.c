@@ -18,19 +18,27 @@ static void err_doit(int, int, const char*, va_list);
 int main(int argc, char* argv[]) {
     char buf[BUFSIZE];
 
+    // user must supply device name
     if (argc < 2) {
         err_quit("Must provide volume path on command line");
     }
 
+    // open the file
     int fd = open(argv[1], O_RDONLY);
     if (fd == -1) {
         err_sys("Failed to open file");
     }
 
+    // read it for partition info
     ssize_t count = read(fd, buf, sizeof(buf));
+    if (count == -1) {
+        err_sys("Error reading file");
+    }
+
+    // check for valid HFS+ signature, header starts at 1k
     HFSPlusVolumeHeader* phdr = (HFSPlusVolumeHeader*) (buf + 1024);
     if (phdr->signature != 0x2b48) {
-        err_quit("Signature does not match HFS+ signature");
+        err_quit("Not a valid HFS+ signature");
     }
 
     close(fd);
