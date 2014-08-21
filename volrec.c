@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 #include <hfs/hfs_format.h>
 
 #define BUFSIZE 4096
