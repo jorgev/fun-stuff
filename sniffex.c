@@ -531,13 +531,13 @@ int main(int argc, char **argv)
             exit(EXIT_FAILURE);
         }
         while (1) {
+            if (pif->flags & PCAP_IF_UP && pif->flags & PCAP_IF_RUNNING)
+                break;
             if (pif->next == NULL) {
                 fprintf(stderr, "Failed to find a suitable device\n");
                 pcap_freealldevs(pif);
                 exit(EXIT_FAILURE);
             }
-            if (pif->flags & PCAP_IF_UP && pif->flags & PCAP_IF_RUNNING)
-                break;
             pif++;
         }
         dev = (char *) malloc(256);
