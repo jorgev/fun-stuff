@@ -567,7 +567,8 @@ int main(int argc, char **argv)
     }
 
     /* make sure we're capturing on an Ethernet device [2] */
-    if (pcap_datalink(handle) != DLT_EN10MB && pcap_datalink(handle) != DLT_NULL) {
+    int link_type = pcap_datalink(handle);
+    if (link_type != DLT_EN10MB && link_type != DLT_LOOP && link_type != DLT_NULL) {
         fprintf(stderr, "%s is not an Ethernet\n", dev);
         exit(EXIT_FAILURE);
     }
