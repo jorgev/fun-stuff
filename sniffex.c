@@ -570,6 +570,7 @@ int main(int argc, char **argv)
     int link_type = pcap_datalink(handle);
     if (link_type != DLT_EN10MB && link_type != DLT_LOOP && link_type != DLT_NULL) {
         fprintf(stderr, "%s is not an Ethernet\n", dev);
+        pcap_close(handle);
         exit(EXIT_FAILURE);
     }
 
@@ -577,6 +578,7 @@ int main(int argc, char **argv)
     if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
         fprintf(stderr, "Couldn't parse filter %s: %s\n",
                 filter_exp, pcap_geterr(handle));
+        pcap_close(handle);
         exit(EXIT_FAILURE);
     }
 
@@ -584,6 +586,8 @@ int main(int argc, char **argv)
     if (pcap_setfilter(handle, &fp) == -1) {
         fprintf(stderr, "Couldn't install filter %s: %s\n",
                 filter_exp, pcap_geterr(handle));
+        pcap_freecode(&fp);
+        pcap_close(handle);
         exit(EXIT_FAILURE);
     }
 
